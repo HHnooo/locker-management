@@ -8,7 +8,7 @@ using namespace std;
 int main() {
     LockerManager mgr;     // 初始化12个储物柜
     ThreadPool pool(4);    // 4个工作线程
-    int choice, row, col;
+    int choice, row, col;  // 用户选择、储物柜坐标
     string name, pwd;
 
     while (1) {
