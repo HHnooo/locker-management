@@ -30,13 +30,13 @@ void LockerManager::showAllStatus() {
     cout << "\n【普通储物柜】" << endl;
     for (int r = 0; r < 2; r++) {
         for (int c = 0; c < 4; c++) {
-            std::unique_lock lock(normalMutexes_[r][c]);  // 加锁
+            unique_lock lock(normalMutexes_[r][c]);  // 加锁
             normalLockers[r][c].showStatus();
         }
     }
     cout << "\n【VIP储物柜】" << endl;
     for (int c = 0; c < 4; c++) {
-        std::unique_lock lock(vipMutexes_[0][c]);  // 加锁
+        unique_lock lock(vipMutexes_[0][c]);  // 加锁
         vipLockers[0][c].showStatus();
     }
 }
@@ -56,7 +56,7 @@ bool LockerManager::storeItem(int row, int col, string userName, string pwd) {
 
     // 普通柜（行1或2）
     if (row == 1 || row == 2) {
-        std::unique_lock lock(normalMutexes_[row - 1][col - 1]);
+        unique_lock lock(normalMutexes_[row - 1][col - 1]);
         if (normalLockers[row - 1][col - 1].getIsUsed()) {
             cout << "错误：该储物柜已被占用，无法存物！" << endl;
             return false;
@@ -80,7 +80,7 @@ bool LockerManager::storeItem(int row, int col, string userName, string pwd) {
                 return false;
             }
         }
-        std::unique_lock lock(vipMutexes_[0][col - 1]);
+        unique_lock lock(vipMutexes_[0][col - 1]);
         if (vipLockers[0][col - 1].getIsUsed()) {
             cout << "错误：该VIP储物柜已被占用，无法存物！" << endl;
             return false;
@@ -109,7 +109,7 @@ bool LockerManager::takeItem(int row, int col, string userName, string pwd) {
 
     // 普通柜（行1或2）
     if (row == 1 || row == 2) {
-        std::unique_lock lock(normalMutexes_[row - 1][col - 1]);
+        unique_lock lock(normalMutexes_[row - 1][col - 1]);
         if (!normalLockers[row - 1][col - 1].getIsUsed()) {
             cout << "错误：该储物柜为空闲状态，无法取物！" << endl;
             return false;
@@ -126,7 +126,7 @@ bool LockerManager::takeItem(int row, int col, string userName, string pwd) {
 
     // VIP柜（行3）
     if (row == 3) {
-        std::unique_lock lock(vipMutexes_[0][col - 1]);
+        unique_lock lock(vipMutexes_[0][col - 1]);
         if (!vipLockers[0][col - 1].getIsUsed()) {
             cout << "错误：该VIP储物柜为空闲状态，无法取物！" << endl;
             return false;
@@ -155,12 +155,12 @@ void LockerManager::countFree() {
 
     for (int r = 0; r < 2; r++) {
         for (int c = 0; c < 4; c++) {
-            std::unique_lock lock(normalMutexes_[r][c]);
+            unique_lock lock(normalMutexes_[r][c]);
             if (!normalLockers[r][c].getIsUsed()) normalFree++;
         }
     }
     for (int c = 0; c < 4; c++) {
-        std::unique_lock lock(vipMutexes_[0][c]);
+        unique_lock lock(vipMutexes_[0][c]);
         if (!vipLockers[0][c].getIsUsed()) vipFree++;
     }
 
