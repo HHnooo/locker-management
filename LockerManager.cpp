@@ -96,49 +96,58 @@ bool LockerManager::storeItem(int row, int col, string userName, string pwd) {
 
 // 取物入口：校验范围→校验姓名→加锁→检查占用→验证身份→取物
 bool LockerManager::takeItem(int row, int col, string userName, string pwd) {
-    // 校验行号列号
+    // ①校验范围：行号1~3，列号1~4
     if (row < 1 || row > 3 || col < 1 || col > 4) {
         cout << "错误：行号或列号超出范围！" << endl;
         return false;
     }
-    // 校验姓名非空
+    // ②校验姓名：不能为空
     if (userName.empty()) {
         cout << "错误：姓名不能为空！" << endl;
         return false;
     }
 
-    // 普通柜（行1或2）
+    // ③普通柜取物（行1或2）
     if (row == 1 || row == 2) {
+        // 多线程加锁：对该柜子加互斥锁
         unique_lock lock(normalMutexes_[row - 1][col - 1]);
+        // 检查占用：空闲则无法取物
         if (!normalLockers[row - 1][col - 1].getIsUsed()) {
             cout << "错误：该储物柜为空闲状态，无法取物！" << endl;
             return false;
         }
+        // 验证身份：姓名必须匹配
         if (normalLockers[row - 1][col - 1].getUser() != userName) {
             cout << "错误：姓名不匹配，取物失败！" << endl;
             return false;
         }
+        // 取物：释放柜子
         normalLockers[row - 1][col - 1].take(userName);
         cout << "取物成功！" << endl;
         testDelay();
         return true;
     }
 
-    // VIP柜（行3）
+    // ④VIP柜取物（行3）
     if (row == 3) {
+        // 多线程加锁：对该VIP柜加互斥锁
         unique_lock lock(vipMutexes_[0][col - 1]);
+        // 检查占用：空闲则无法取物
         if (!vipLockers[0][col - 1].getIsUsed()) {
             cout << "错误：该VIP储物柜为空闲状态，无法取物！" << endl;
             return false;
         }
+        // 验证身份：姓名必须匹配
         if (vipLockers[0][col - 1].getUser() != userName) {
             cout << "错误：姓名不匹配，取物失败！" << endl;
             return false;
         }
+        // 验证身份：密码必须正确
         if (!vipLockers[0][col - 1].verifyPassword(pwd)) {
             cout << "错误：密码错误，取物失败！" << endl;
             return false;
         }
+        // 取物：释放柜子
         vipLockers[0][col - 1].takeVIP(userName, pwd);
         cout << "VIP取物成功！" << endl;
         testDelay();

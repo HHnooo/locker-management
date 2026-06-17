@@ -42,5 +42,6 @@ bool VIPLocker::takeVIP(string userName, string pwd) {
     if (userName != getUser()) return false; // 姓名不匹配
     if (pwd != password) return false;       // 密码不匹配
     clearUser();                              // 释放柜子
+    password = "";                            // 清空密码
     return true;
 }
